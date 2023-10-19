@@ -1,0 +1,24 @@
+pytz==2021.1  # https://github.com/stub42/pytz
+psycopg2-binary==2.8.6  # https://github.com/psycopg/psycopg2  # https://github.com/psycopg/psycopg2
+redis==3.5.3  # https://github.com/antirez/redis
+celery==5.1.2  # https://github.com/celery/celery
+drf-yasg==1.20.0  # https://github.com/axnsan12/drf-yasg
+python-dateutil==2.8.0  # https://github.com/dateutil/dateutil
+
+# Django
+# ------------------------------------------------------------------------------
+django==3.2.13  # https://www.djangoproject.com/
+django-environ==0.9.0  # https://github.com/joke2k/django-environ
+django-model-utils==4.1.1  # https://github.com/jazzband/django-model-utils
+django-allauth==0.45.0  # https://github.com/pennersr/django-allauth
+django-redis==4.11.0  # https://github.com/niwinz/django-redis
+django-cors-headers==3.2.1  # https://github.com/adamchainz/django-cors-headers
+django-filter==22.1 # https://pypi.org/project/django-filter/
+
+
+# Django REST Framework
+djangorestframework==3.12.2  # https://github.com/encode/django-rest-framework
+coreapi==2.3.3  # https://github.com/core-api/python-client
+django-rest-auth==0.9.5  # https://github.com/Tivix/django-rest-auth
+dj-rest-auth==2.2.7 # https://pypi.org/project/dj-rest-auth/
+djangorestframework-jwt==1.11.0 # https://pypi.org/project/djangorestframework-jwt/
