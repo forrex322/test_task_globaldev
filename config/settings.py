@@ -82,16 +82,25 @@ DATABASES = {
 # https://docs.djangoproject.com/en/2.2/ref/settings/#installed-apps
 # ------------------------------------------------------------------------------
 DJANGO_APPS = (
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
+    "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.admin",
 )
 THIRD_PARTY_APPS = (
     "rest_framework",
+    "rest_framework.authtoken",
     "drf_yasg",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "corsheaders",
+    "rest_auth",
+    "rest_auth.registration",
+    "oauth2_provider",
 )
 LOCAL_APPS = (
     "users.apps.UsersConfig",
@@ -111,25 +120,38 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Django Templates
+# https://docs.djangoproject.com/en/2.2/ref/settings/#templates
+# ------------------------------------------------------------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
+        "DIRS": [
+            str(APPS_DIR.path("templates")),
+        ],
         "OPTIONS": {
+            "debug": DEBUG,
+            "loaders": [
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ],
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
             ],
         },
-    },
+    }
 ]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
-
+# ------------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -156,6 +178,12 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
+# Django Media Files
+# https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
+# ------------------------------------------------------------------------------
+MEDIA_URL = "/media/"
+MEDIA_ROOT = env("DJANGO_MEDIA_ROOT")
+
 # Celery
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html
 # ------------------------------------------------------------------------------
@@ -165,3 +193,71 @@ if env.bool("DJANGO_TEST_RUN") or any("pytest" in arg for arg in sys.argv):
     CELERY_TASK_ALWAYS_EAGER = True
 else:
     CELERY_TASK_ALWAYS_EAGER = env.bool("DJANGO_CELERY_TASK_ALWAYS_EAGER")
+
+# Django Auth
+# https://docs.djangoproject.com/en/2.2/ref/settings/#auth
+# ------------------------------------------------------------------------------
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+AUTH_USER_MODEL = "users.User"
+LOGIN_URL = "api:users:auth:login"
+LOGIN_REDIRECT_URL = "/"
+
+# django-allauth
+# https://django-allauth.readthedocs.io/en/latest/configuration.html
+# ------------------------------------------------------------------------------
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USER_EMAIL_FIELD = "email"
+# Django REST Framework
+# https://www.django-rest-framework.org/api-guide/settings/
+# ------------------------------------------------------------------------------
+PAGE_SIZE = 10
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.BasicAuthentication",
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": PAGE_SIZE,
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
+}
+
+# API Documentation: drf-yasg
+# https://drf-yasg.readthedocs.io/en/stable/settings.html
+# ------------------------------------------------------------------------------
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
+    "PERSIST_AUTH": True,
+    "SECURITY_DEFINITIONS": {
+        "Token": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    },
+}
+
+# django-rest-auth
+# https://django-rest-auth.readthedocs.io/en/latest/configuration.html
+# ------------------------------------------------------------------------------
+LOGOUT_ON_PASSWORD_CHANGE = False
+OLD_PASSWORD_FIELD_ENABLED = True
+REST_AUTH_SERIALIZERS = {
+    "TOKEN_SERIALIZER": "users.serializers.TokenSerializer",
+}
+REST_AUTH_REGISTER_SERIALIZERS = {
+    "REGISTER_SERIALIZER": "users.serializers.RegisterSerializer",
+}

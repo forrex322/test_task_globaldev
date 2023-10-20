@@ -2,7 +2,7 @@
 
 [MASTER]
 load-plugins = pylint_django, pylint_celery
-init-hook = 'import sys; sys.path.insert(0, "recruitment_app/apps");'
+init-hook = 'import sys; sys.path.insert(0, "globaldev_app/apps");'
 ignore =
     .git,
     migrations,
