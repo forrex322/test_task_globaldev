@@ -27,6 +27,7 @@ urlpatterns = [
 ]
 
 urlpatterns += i18n_patterns(
+    path(settings.ADMIN_URL, admin.site.urls),
     # drf-yasg url
     re_path(
         r"^docs/$",
