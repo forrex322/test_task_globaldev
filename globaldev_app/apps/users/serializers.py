@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.db.models import Sum
 from django.utils.translation import gettext as _
 
 from allauth.account.adapter import get_adapter
@@ -13,12 +14,17 @@ from rest_auth.serializers import (
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from booktimetracker.models import ReadingSession
 from users.models import User, Profile
 
 UserModel = get_user_model()
 
 
 class RegisterSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer for registration a new user.
+    """
+
     email = serializers.EmailField(required=True, help_text=_("Email address"))
     password1 = serializers.CharField(write_only=True, help_text=_("Password"))
     password2 = serializers.CharField(
@@ -69,6 +75,10 @@ class RegisterSerializer(serializers.Serializer):  # pylint: disable=abstract-me
 
 
 class UserShortSerializer(serializers.ModelSerializer):
+    """
+    Serializer that returns short information about user.
+    """
+
     class Meta:
         model = User
         fields = (
@@ -79,6 +89,10 @@ class UserShortSerializer(serializers.ModelSerializer):
 
 
 class TokenSerializer(BaseTokenSerializer):
+    """
+    Serializer that returns token for user authentication.
+    """
+
     user = UserShortSerializer(read_only=True)
 
     class Meta:
@@ -88,6 +102,10 @@ class TokenSerializer(BaseTokenSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for work with user's profile.
+    """
+
     username = serializers.CharField(
         max_length=150,
         validators=[
@@ -97,6 +115,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     )
     first_name = serializers.CharField(max_length=30, allow_blank=True)
     last_name = serializers.CharField(max_length=150, allow_blank=True)
+    total_reading_time = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
@@ -104,6 +123,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = (
             "description",
             "birth_date",
+            "total_reading_time",
             "last_7_days_statistic",
             "last_30_days_statistic",
         ) + user_fields
@@ -134,3 +154,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         user.save()
 
         return profile_data
+
+    @staticmethod
+    def get_total_reading_time(obj):
+        data = ReadingSession.objects.filter(user=obj.user).aggregate(
+            total_reading_time=Sum("duration_of_session")
+        )
+        return str(data["total_reading_time"])
