@@ -42,7 +42,6 @@ env = environ.Env(
 # https://docs.djangoproject.com/en/2.2/ref/settings/#core-settings
 DEBUG = env.bool("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
-# SECRET_KEY = 'django-insecure-(yo8h$q97e7jo-^)qj#3n^3p#ckj#=ms(7m-i2%6@om0n603z9'
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
